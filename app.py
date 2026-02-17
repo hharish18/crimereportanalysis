@@ -178,9 +178,15 @@ def login():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
+        role = request.form.get("role", "").strip().lower()
+
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password_hash, password):
             flash("Invalid email or password.", "danger")
+            return redirect(url_for("login"))
+            
+        if user.role != role:
+            flash(f"Invalid role selected. This account is registered as '{user.role}'.", "danger")
             return redirect(url_for("login"))
 
         login_user(user)
