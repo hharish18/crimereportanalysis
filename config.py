@@ -7,9 +7,11 @@ os.makedirs(DB_DIR, exist_ok=True)
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-me")
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", f"sqlite:///{os.path.join(DB_DIR, 'crime_report.db')}"
-    )
+    raw_db_url = os.environ.get("DATABASE_URL")
+    if raw_db_url and raw_db_url.startswith("postgres://"):
+        raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+        
+    SQLALCHEMY_DATABASE_URI = raw_db_url or f"sqlite:///{os.path.join(DB_DIR, 'crime_report.db')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,

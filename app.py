@@ -26,7 +26,11 @@ from werkzeug.utils import secure_filename
 from config import Config
 from models import Complaint, Feedback, Notification, Officer, User, db
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates"),
+    static_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), "static"),
+)
 app.config.from_object(Config)
 
 db.init_app(app)
