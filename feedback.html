@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-3">Feedback for {{ complaint.complaint_id }}</h4>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+        <label class="form-label">Rating (1-5)</label>
+        <select class="form-select" name="rating" required>
+          {% for i in [1,2,3,4,5] %}
+          <option value="{{ i }}" {% if existing and existing.rating == i %}selected{% endif %}>{{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Comments</label>
+        <textarea class="form-control" rows="4" name="comments">{{ existing.comments if existing else '' }}</textarea>
+      </div>
+      <button class="btn btn-primary">Submit Feedback</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="mb-3">Search & Filter Complaints</h5>
+    <form method="GET" class="row g-2">
+      <div class="col-md-2"><input class="form-control" name="complaint_id" placeholder="Complaint ID" value="{{ request.args.get('complaint_id', '') }}"></div>
+      <div class="col-md-2"><input class="form-control" name="user_name" placeholder="User Name" value="{{ request.args.get('user_name', '') }}"></div>
+      <div class="col-md-2"><input class="form-control" name="location" placeholder="Location" value="{{ request.args.get('location', '') }}"></div>
+      <div class="col-md-2">
+        <select class="form-select" name="crime_type">
+          <option value="">Crime Type</option>
+          {% for c in crime_types %}
+          <option value="{{ c }}" {% if request.args.get('crime_type') == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="status">
+          <option value="">Status</option>
+          {% for s in statuses %}
+          <option value="{{ s }}" {% if request.args.get('status') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1"><input type="date" class="form-control" name="date_from" value="{{ request.args.get('date_from', '') }}"></div>
+      <div class="col-md-1"><input type="date" class="form-control" name="date_to" value="{{ request.args.get('date_to', '') }}"></div>
+      <div class="col-12">
+        <button class="btn btn-primary btn-sm">Apply</button>
+        <a href="{{ url_for('complaints') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table id="complaintsTable" class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Reporter</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Evidence</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+          <tr>
+            <td>{{ c.complaint_id }}</td>
+            <td>{{ c.reporter.full_name }}</td>
+            <td>{{ c.crime_type }}</td>
+            <td>{{ c.location }}</td>
+            <td><span class="badge text-bg-primary">{{ c.status }}</span></td>
+            <td>{{ c.created_at.strftime("%Y-%m-%d") }}</td>
+            <td>
+              {% if c.evidence_file %}
+              <a target="_blank" href="{{ url_for('static', filename='uploads/' ~ c.evidence_file) }}">View</a>
+              {% else %}
+              -
+              {% endif %}
+            </td>
+            <td>
+              {% if current_user.role in ["admin", "police"] %}
+              <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#edit{{ c.id }}" aria-expanded="false" aria-controls="edit{{ c.id }}">Update</button>
+              <div class="collapse mt-2" id="edit{{ c.id }}">
+                <form method="POST" action="{{ url_for('update_complaint', complaint_db_id=c.id) }}" class="row g-2">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <div class="col-12">
+                    <select class="form-select form-select-sm" name="status">
+                      {% for s in statuses %}
+                      <option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <select class="form-select form-select-sm" name="assigned_officer_id">
+                      <option value="">Assign Officer</option>
+                      {% for officer in officers %}
+                      <option value="{{ officer.id }}" {% if c.assigned_officer_id == officer.id %}selected{% endif %}>
+                        {{ officer.user.full_name }} ({{ officer.badge_number }})
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <input type="text" class="form-control form-control-sm" name="remarks" value="{{ c.remarks or '' }}" placeholder="Remarks / Investigation notes">
+                  </div>
+                  <div class="col-12">
+                    <button class="btn btn-primary btn-sm w-100">Save</button>
+                  </div>
+                </form>
+              </div>
+              {% endif %}
+              {% if current_user.role == "citizen" and c.status == "Resolved" %}
+              <a class="btn btn-sm btn-outline-success" href="{{ url_for('feedback', complaint_db_id=c.id) }}">Feedback</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

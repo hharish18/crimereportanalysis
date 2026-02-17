@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h4 class="mb-3">Profile Management</h4>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" name="full_name" value="{{ current_user.full_name }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email (readonly)</label>
+          <input class="form-control" value="{{ current_user.email }}" disabled>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone</label>
+          <input class="form-control" name="phone" value="{{ current_user.phone or '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Address</label>
+          <input class="form-control" name="address" value="{{ current_user.address or '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">New Password</label>
+          <input type="password" class="form-control" name="new_password" placeholder="Leave blank to keep current">
+        </div>
+      </div>
+      <button class="btn btn-primary mt-4">Update Profile</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

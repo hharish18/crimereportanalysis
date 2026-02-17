@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h4 class="mb-3">Submit Crime Report</h4>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" name="title" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Crime Type</label>
+          <select class="form-select" name="crime_type" required>
+            {% for t in crime_types %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-control" name="location" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Date & Time</label>
+          <input type="datetime-local" class="form-control" name="incident_datetime" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" rows="4" name="description" required></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Upload Evidence (image/document)</label>
+          <input type="file" class="form-control" name="evidence">
+        </div>
+      </div>
+      <button class="btn btn-primary mt-4">Submit Complaint</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

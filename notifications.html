@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-3">Notifications</h4>
+    {% if notifications %}
+      {% for n in notifications %}
+      <div class="notification-item {% if not n.is_read %}unread{% endif %}">
+        <div>
+          <h6 class="mb-1">{{ n.title }}</h6>
+          <p class="mb-1">{{ n.message }}</p>
+          <small class="text-muted">{{ n.created_at.strftime("%Y-%m-%d %H:%M") }}</small>
+        </div>
+        {% if not n.is_read %}
+        <form method="POST" action="{{ url_for('mark_notification_read', note_id=n.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-primary">Mark as read</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted mb-0">No notifications.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

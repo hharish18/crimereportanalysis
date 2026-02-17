@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <h6>Total Complaints</h6>
+        <h3>{{ total }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <h6>Pending</h6>
+        <h3>{{ pending }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <h6>Investigating</h6>
+        <h3>{{ investigating }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <h6>Resolved</h6>
+        <h3>{{ resolved }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6>Crimes by Category</h6>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6>Crimes by Location</h6>
+        <canvas id="locationChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h6>Monthly Trend</h6>
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const categoryLabels = {{ category_labels|tojson }};
+  const categoryData = {{ category_data|tojson }};
+  const locationLabels = {{ location_labels|tojson }};
+  const locationData = {{ location_data|tojson }};
+  const trendLabels = {{ trend_labels|tojson }};
+  const trendData = {{ trend_data|tojson }};
+
+  new Chart(document.getElementById("categoryChart"), {
+    type: "bar",
+    data: { labels: categoryLabels, datasets: [{ label: "Count", data: categoryData, backgroundColor: "#0d6efd" }] }
+  });
+  new Chart(document.getElementById("locationChart"), {
+    type: "pie",
+    data: { labels: locationLabels, datasets: [{ data: locationData, backgroundColor: ["#0d6efd", "#20c997", "#ffc107", "#dc3545", "#6610f2"] }] }
+  });
+  new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: { labels: trendLabels, datasets: [{ label: "Complaints", data: trendData, borderColor: "#0a58ca", fill: false, tension: 0.2 }] }
+  });
+</script>
+{% endblock %}
